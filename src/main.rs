@@ -4,7 +4,7 @@ mod renderer;
 
 use minifb::{Key, Window, WindowOptions};
 use player::{move_player, Player};
-use raycast::fast_raycast;
+use raycast::ray_march;
 use renderer::scale_buffer;
 use std::{
     cmp::min, f32::consts::PI, time::{Duration, Instant}, usize
@@ -76,7 +76,7 @@ fn main() {
         for x in 0..BUFFER_WIDTH {
             let ray_angle =
                 (player.rotation - FOV / 2.0) + (x as f32) * (FOV / BUFFER_WIDTH as f32);
-            let (ray, uv) = fast_raycast(
+            let (ray, uv) = ray_march(
                 player.pos_x,
                 player.pos_y,
                 ray_angle,

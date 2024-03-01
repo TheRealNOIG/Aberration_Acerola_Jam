@@ -1,50 +1,3 @@
-use std::cmp::max;
-
-/// Performs a raycast in a 2D grid map, returning the distance to the first encountered obstacle.
-///
-/// # Parameters:
-/// - `start_x`: The starting x-coordinate of the ray.
-/// - `start_y`: The starting y-coordinate of the ray.
-/// - `theta`: The angle of the ray in radians.
-/// - `step_increment`: The increment for each step of the ray.
-/// - `max_distance`: The maximum distance the ray can travel.
-/// - `map_width`: The width of the 2D grid map.
-/// - `map_height`: The height of the 2D grid map.
-/// - `map`: A reference to the 2D grid map, represented as a linear array.
-///
-/// # Returns:
-/// The distance to the first obstacle hit by the ray, or the maximum distance if no obstacle is encountered.
-pub fn slow_raycast(
-    start_x: f32,
-    start_y: f32,
-    theta: f32,
-    step_increment: f32,
-    map_width: usize,
-    map_height: usize,
-    map: &[u8],
-) -> f32 {
-    let mut distance = 0.0;
-    let (mut x, mut y) = (start_x, start_y);
-    let (dx, dy) = (theta.cos() * step_increment, theta.sin() * step_increment);
-
-    while distance < max(map_width, map_height) as f32 {
-        let grid_x = x as usize;
-        let grid_y = y as usize;
-
-        if grid_x >= map_width || grid_y >= map_height {
-            break;
-        }
-        if map[grid_x + grid_y * map_width] == 1 {
-            return distance;
-        }
-
-        x += dx;
-        y += dy;
-        distance += step_increment;
-    }
-
-    distance
-}
 
 /// Performs a fast raycast in a 2D grid map to find the distance to the first obstacle from a given starting point.
 ///
@@ -60,7 +13,7 @@ pub fn slow_raycast(
 /// # Returns
 ///
 /// The function returns the distance to the first obstacle encountered in the direction of `theta`. If no obstacle is encountered within the map bounds, `f32::MAX` is returned.
-pub fn fast_raycast(
+pub fn ray_march(
     start_x: f32,
     start_y: f32,
     theta: f32,
