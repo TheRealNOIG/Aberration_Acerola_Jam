@@ -5,7 +5,7 @@ mod timer;
 
 use minifb::{Key, KeyRepeat, Window, WindowOptions};
 use player::{move_player, Player};
-use renderer::{fill_buffer_rand, render_black_and_white, render_delta_only};
+use renderer::{fill_buffer_rand, render_black_and_white, render_aberration};
 use std::{cell::RefCell, f32::consts::PI, rc::Rc, u32, usize};
 use timer::Timer;
 
@@ -94,7 +94,7 @@ fn main() {
         if render_state {
             scalled_buffer = render_black_and_white(&mut buffer, &player);
         } else {
-            scalled_buffer = render_delta_only(&mut buffer, &player);
+            scalled_buffer = render_aberration(&mut buffer, &player);
         }
 
         window_binding

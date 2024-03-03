@@ -77,8 +77,9 @@ pub fn render_black_and_white(buffer: &mut Vec<u32>, player: &Player) -> Vec<u32
     )
 }
 
-// TODO only flip pixel if it changed between frames
-pub fn render_delta_only(buffer: &mut Vec<u32>, player: &Player) -> Vec<u32> {
+pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<u32> {
+    let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
+
     for x in 0..BUFFER_WIDTH {
         let ray_angle = (player.rotation - FOV / 2.0) + (x as f32) * (FOV / BUFFER_WIDTH as f32);
         let (ray, uv) = ray_march(player.pos_x, player.pos_y, ray_angle, 32, 32, &MAP);
@@ -89,16 +90,23 @@ pub fn render_delta_only(buffer: &mut Vec<u32>, player: &Player) -> Vec<u32> {
 
         for y in wall_start..min(wall_end, BUFFER_HEIGHT) {
             if y == wall_start || y == min(wall_end, BUFFER_HEIGHT) - 1 {
-                buffer[x + y * BUFFER_WIDTH] = buffer[x + y * BUFFER_WIDTH] ^ 0x00FFFFFF;
+                buffer[x + y * BUFFER_WIDTH] =  0xFF000000;
             }
             if uv < 0.03 || uv > 0.99 {
-                buffer[x + y * BUFFER_WIDTH] = buffer[x + y * BUFFER_WIDTH] ^ 0x00FFFFFF;
+                buffer[x + y * BUFFER_WIDTH] = 0xFF000000;
             }
+        }
+    }
+    
+
+    for i in 0..buffer.len() {
+        if prev_buffer[i] & 0xFF000000 != buffer[i] & 0xFF000000 {
+            prev_buffer[i] = prev_buffer[i] ^ 0xFFFFFFFF;
         }
     }
 
     scale_buffer(
-        &buffer,
+        &prev_buffer,
         BUFFER_WIDTH,
         BUFFER_HEIGHT,
         WINDOW_WIDTH,
