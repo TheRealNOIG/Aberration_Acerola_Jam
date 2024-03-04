@@ -94,12 +94,13 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<f32
     z_buffer
 }
 
+// TODO:  make a sprite renderer that uses the depth buffer
+
 pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
     for i in 0..buffer.len() {
         buffer[i] = 0;
     }
 
-    // TODO:  make a real sprite renderer
     let mut rng = rand::thread_rng();
     let half_fov = FOV / 2.0;
 
