@@ -56,6 +56,8 @@ const FOV: f32 = PI / 3.0;
 
 fn main() {
     let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
+    let mut tst_buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
+    let mut cmp_buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
 
     let window_handler = Rc::new(RefCell::new(
         Window::new(
@@ -121,10 +123,17 @@ fn main() {
             render_aberration(&mut buffer, &player);
         }
 
-        draw_portal(&mut buffer, &player);
+        draw_portal(&mut tst_buffer, &player);
+        for i in 0..tst_buffer.len(){
+            if tst_buffer[i] & 0xFF000000 == 0xFF000000{
+                cmp_buffer[i] = tst_buffer[i];
+            } else {
+                cmp_buffer[i] = buffer[i];
+            }
+        }
 
         let scalled_buffer = scale_buffer(
-            &buffer,
+            &cmp_buffer,
             BUFFER_WIDTH,
             BUFFER_HEIGHT,
             WINDOW_WIDTH,

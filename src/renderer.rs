@@ -96,6 +96,10 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
 }
 
 pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
+    for i in 0..buffer.len() {
+        buffer[i] = 0;
+    }
+
     let mut rng = rand::thread_rng();
     // TODO make a real sprite renderer
     let half_fov = FOV / 2.0;
@@ -128,7 +132,9 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
                 let dy = y as f32 - sprite_screen_y;
                 if (dx.powi(2) / portal_width.powi(2)) + (dy.powi(2) / portal_height.powi(2)) <= 1.0
                 {
+                    // TODO make color version of portal
                     let i = x + y * BUFFER_WIDTH;
+                    buffer[i] = 0xFF000000;
 
                     // this one dose a cool cleanup effect of the static
                     // This should be used when the portal is not being blocked by a wall
@@ -138,7 +144,7 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
 
                     // and this one used when behind a wall.
                     if rng.gen_range(0..=100) < 10 {
-                        buffer[i] = buffer[i] ^ 0xFFFFFFFF;
+                        buffer[i] = 0xFFFFFFFF;
                     }
                 }
             }
