@@ -9,6 +9,8 @@ use renderer::{fill_buffer_rand, render_black_and_white, render_aberration};
 use std::{cell::RefCell, f32::consts::PI, rc::Rc, u32, usize};
 use timer::Timer;
 
+
+const TWO_PI: f32 = 2.0 * std::f32::consts::PI;
 const MAP_WIDTH: usize = 32;
 const MAP: [u8; MAP_WIDTH * MAP_WIDTH] = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

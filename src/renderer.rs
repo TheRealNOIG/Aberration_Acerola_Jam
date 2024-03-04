@@ -7,8 +7,7 @@ use std::{
 use rand::Rng;
 
 use crate::{
-    player::Player, raycast::ray_march, BUFFER_HEIGHT, BUFFER_WIDTH, FOV, MAP, WINDOW_HEIGHT,
-    WINDOW_WIDTH,
+    player::Player, raycast::ray_march, BUFFER_HEIGHT, BUFFER_WIDTH, FOV, MAP, TWO_PI, WINDOW_HEIGHT, WINDOW_WIDTH
 };
 
 pub fn scale_buffer(
@@ -61,26 +60,27 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<u32
     let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
 
     // TODO make a real sprite renderer
-    let mut test: Player = Player::new(16.0, 16.0, 0.0);
+    let half_fov = FOV / 2.0;
+
+    let test: Player = Player::new(16.0, 16.0, 0.0);
     let delta_x = test.pos_x - player.pos_x;
     let delta_y = test.pos_y - player.pos_y;
 
     // Calculate the distance and angle to the sprite
-    let distance_to_sprite = (delta_x.powi(2) + delta_y.powi(2)).sqrt().abs();
+    let distance_to_sprite = (delta_x.powi(2) + delta_y.powi(2)).sqrt();
     let sprite_angle = delta_y.atan2(delta_x);
 
     // Translate the sprite's angle to FOV coordinates
     let sprite_angle_relative_to_fov =
-        (sprite_angle - player.rotation).rem_euclid(2.0 * std::f32::consts::PI);
+        (sprite_angle - player.rotation).rem_euclid(TWO_PI);
 
-    let sprite_screen_x = (((sprite_angle_relative_to_fov + (FOV / 2.0)) / FOV)
+    let sprite_screen_x = (((sprite_angle_relative_to_fov + half_fov) / FOV)
         * BUFFER_WIDTH as f32)
         % BUFFER_WIDTH as f32;
 
-    let half_fov = FOV / 2.0;
 
     if sprite_angle_relative_to_fov <= half_fov 
-        || sprite_angle_relative_to_fov >= (2.0 * std::f32::consts::PI) - half_fov 
+        || sprite_angle_relative_to_fov >= (TWO_PI) - half_fov 
     {
         let sprite_size = BUFFER_HEIGHT as f32 / distance_to_sprite;
         let sprite_screen_y = (BUFFER_HEIGHT as f32 - sprite_size) / 2.0;
