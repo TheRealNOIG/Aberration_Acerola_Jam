@@ -64,7 +64,6 @@ fn main() {
             panic!("{}", e);
         }),
     ));
-
     let window_binding = Rc::clone(&window_handler);
     let window_binding_clone = Rc::clone(&window_handler);
 
@@ -78,9 +77,12 @@ fn main() {
     );
 
     let mut player = Player::new(4.0, 4.0, 0.0);
+    let mut test = Player::new(10.0, 10.0, 0.0);
+
     let mut render_state = true;
 
     while window_binding.borrow().is_open() && !window_binding.borrow().is_key_down(Key::Escape) {
+
         fps_timer.tick();
 
         move_player(&mut player, &window_binding.borrow());
