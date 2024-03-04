@@ -53,7 +53,8 @@ pub fn fill_buffer_rand_bw(buffer: &mut Vec<u32>) {
 
     for i in 0..buffer.len() {
         let color_value = if rng.gen::<bool>() { 255 } else { 0 };
-        let color = ((color_value as u32) << 16) | ((color_value as u32) << 8) | (color_value as u32);
+        let color =
+            ((color_value as u32) << 16) | ((color_value as u32) << 8) | (color_value as u32);
         buffer[i] = color;
     }
 }
@@ -95,6 +96,7 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
 }
 
 pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
+    let mut rng = rand::thread_rng();
     // TODO make a real sprite renderer
     let half_fov = FOV / 2.0;
 
@@ -135,7 +137,6 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
                     // buffer[i] = buffer[i] ^ 0xFF000000;
 
                     // and this one used when behind a wall.
-                    let mut rng = rand::thread_rng();
                     if rng.gen_range(0..=100) < 10 {
                         buffer[i] = buffer[i] ^ 0xFFFFFFFF;
                     }
