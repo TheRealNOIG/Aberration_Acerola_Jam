@@ -1,15 +1,8 @@
-use std::{
-    cmp::{max, min},
-    f32::consts::PI,
-    u32,
-};
+use std::cmp::min;
 
 use rand::Rng;
 
-use crate::{
-    player::Player, raycast::ray_march, BUFFER_HEIGHT, BUFFER_WIDTH, FOV, MAP, TWO_PI,
-    WINDOW_HEIGHT, WINDOW_WIDTH,
-};
+use crate::{player::Player, raycast::ray_march, BUFFER_HEIGHT, BUFFER_WIDTH, FOV, MAP, TWO_PI};
 
 pub fn scale_buffer(
     buffer: &[u32],
@@ -67,6 +60,7 @@ pub fn render_black_and_white(buffer: &mut Vec<u32>, player: &Player) {
     render_aberration(buffer, player)
 }
 
+// TODO draw window distance to zbuffer for later use when drawing sprites
 pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
     let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
 
@@ -100,8 +94,8 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
         buffer[i] = 0;
     }
 
-    let mut rng = rand::thread_rng();
     // TODO make a real sprite renderer
+    let mut rng = rand::thread_rng();
     let half_fov = FOV / 2.0;
 
     let test: Player = Player::new(16.0, 16.0, 0.0);
