@@ -5,10 +5,12 @@ mod timer;
 
 use minifb::{Key, KeyRepeat, Window, WindowOptions};
 use player::{move_player, Player};
-use renderer::{fill_buffer_rand, render_black_and_white, render_aberration};
+use renderer::{
+    draw_portal, fill_buffer_rand, fill_buffer_rand_bw, render_aberration, render_black_and_white,
+    scale_buffer,
+};
 use std::{cell::RefCell, f32::consts::PI, rc::Rc, u32, usize};
 use timer::Timer;
-
 
 const TWO_PI: f32 = 2.0 * std::f32::consts::PI;
 const MAP_WIDTH: usize = 32;
@@ -79,27 +81,55 @@ fn main() {
     );
 
     let mut player = Player::new(4.0, 4.0, 0.0);
-    let mut test = Player::new(10.0, 10.0, 0.0);
 
     let mut render_state = true;
+    let mut color_state = true;
 
     while window_binding.borrow().is_open() && !window_binding.borrow().is_key_down(Key::Escape) {
-
         fps_timer.tick();
 
         move_player(&mut player, &window_binding.borrow());
 
-        if window_binding.borrow().is_key_pressed(Key::Space, KeyRepeat::No) {
+        // TODO move key action to own fn and file
+        if window_binding
+            .borrow()
+            .is_key_pressed(Key::Enter, KeyRepeat::No)
+        {
+            color_state = !color_state;
+            if !render_state {
+                if color_state {
+                    fill_buffer_rand_bw(&mut buffer);
+                } else {
+                    fill_buffer_rand(&mut buffer);
+                }
+            }
+        }
+        if window_binding
+            .borrow()
+            .is_key_pressed(Key::Space, KeyRepeat::No)
+        {
             render_state = !render_state;
-            fill_buffer_rand(&mut buffer);
+            if color_state {
+                fill_buffer_rand_bw(&mut buffer);
+            } else {
+                fill_buffer_rand(&mut buffer);
+            }
+        }
+        if render_state {
+            render_black_and_white(&mut buffer, &player);
+        } else {
+            render_aberration(&mut buffer, &player);
         }
 
-        let scalled_buffer: Vec<u32>;
-        if render_state {
-            scalled_buffer = render_black_and_white(&mut buffer, &player);
-        } else {
-            scalled_buffer = render_aberration(&mut buffer, &player);
-        }
+        draw_portal(&mut buffer, &player);
+
+        let scalled_buffer = scale_buffer(
+            &buffer,
+            BUFFER_WIDTH,
+            BUFFER_HEIGHT,
+            WINDOW_WIDTH,
+            WINDOW_HEIGHT,
+        );
 
         window_binding
             .borrow_mut()
