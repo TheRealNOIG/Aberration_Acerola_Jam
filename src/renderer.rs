@@ -60,7 +60,7 @@ pub fn render_black_and_white(buffer: &mut Vec<u32>, player: &Player) {
     render_aberration(buffer, player)
 }
 
-// TODO draw window distance to zbuffer for later use when drawing sprites
+// TODO:  draw window distance to zbuffer for later use when drawing sprites
 pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
     let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
 
@@ -94,7 +94,7 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
         buffer[i] = 0;
     }
 
-    // TODO make a real sprite renderer
+    // TODO:  make a real sprite renderer
     let mut rng = rand::thread_rng();
     let half_fov = FOV / 2.0;
 
@@ -126,7 +126,7 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
                 let dy = y as f32 - sprite_screen_y;
                 if (dx.powi(2) / portal_width.powi(2)) + (dy.powi(2) / portal_height.powi(2)) <= 1.0
                 {
-                    // TODO make color version of portal
+                    // TODO: make color version of portal
                     let i = x + y * BUFFER_WIDTH;
                     buffer[i] = 0xFF000000;
 
