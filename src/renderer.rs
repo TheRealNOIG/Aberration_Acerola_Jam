@@ -52,7 +52,7 @@ pub fn fill_buffer_rand_bw(buffer: &mut Vec<u32>) {
     }
 }
 
-pub fn render_black_and_white(buffer: &mut Vec<u32>, player: &Player) {
+pub fn render_black_and_white(buffer: &mut Vec<u32>, player: &Player) -> Vec<f32> {
     for i in 0..buffer.len() {
         buffer[i] = 0;
     }
@@ -60,9 +60,9 @@ pub fn render_black_and_white(buffer: &mut Vec<u32>, player: &Player) {
     render_aberration(buffer, player)
 }
 
-// TODO:  draw window distance to zbuffer for later use when drawing sprites
-pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
+pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<f32> {
     let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
+    let mut z_buffer: Vec<f32> = vec![f32::MAX; BUFFER_WIDTH];
 
     for x in 0..BUFFER_WIDTH {
         let ray_angle = (player.rotation - FOV / 2.0) + (x as f32) * (FOV / BUFFER_WIDTH as f32);
@@ -80,6 +80,9 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
                 buffer[x + y * BUFFER_WIDTH] = 0xFF000000;
             }
         }
+
+        // add ray distance to z buffer
+        z_buffer[x] = ray;
     }
 
     for i in 0..buffer.len() {
@@ -87,6 +90,8 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) {
             prev_buffer[i] = prev_buffer[i] ^ 0xFFFFFFFF;
         }
     }
+
+    z_buffer
 }
 
 pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
