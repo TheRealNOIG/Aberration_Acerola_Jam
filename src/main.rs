@@ -57,7 +57,7 @@ const FOV: f32 = PI / 3.0;
 
 fn main() {
     let mut buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
-    let mut tst_buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
+    let mut portal_buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
     let mut cmp_buffer: Vec<u32> = vec![0; BUFFER_WIDTH * BUFFER_HEIGHT];
 
     let mut render_state = RenderState {
@@ -104,11 +104,11 @@ fn main() {
         } else {
             render_aberration(&mut buffer, &player);
         }
-        draw_portal(&mut tst_buffer, &player, &render_state);
+        draw_portal(&mut portal_buffer, &player, &render_state);
 
-        for i in 0..tst_buffer.len() {
-            if tst_buffer[i] & 0xFF000000 == 0xFF000000 {
-                cmp_buffer[i] = tst_buffer[i];
+        for i in 0..portal_buffer.len() {
+            if portal_buffer[i] & 0xFF000000 == 0xFF000000 {
+                cmp_buffer[i] = portal_buffer[i];
             } else {
                 cmp_buffer[i] = buffer[i];
             }

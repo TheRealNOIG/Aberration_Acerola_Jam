@@ -102,7 +102,7 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<f32
 
 // TODO: make a sprite renderer that uses the depth buffer
 
-// TODO: cleanup portal renderer
+// TODO: cleanup portal renderer and move gearic sprite possitioning code to its own function
 pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &RenderState) {
     for i in 0..buffer.len() {
         buffer[i] = 0;
