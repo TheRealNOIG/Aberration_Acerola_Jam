@@ -51,8 +51,8 @@ const MAP: [u8; MAP_WIDTH * MAP_WIDTH] = [
 ];
 const WINDOW_WIDTH: usize = 1080;
 const WINDOW_HEIGHT: usize = 720;
-const BUFFER_WIDTH: usize = 270;
-const BUFFER_HEIGHT: usize = 180;
+const BUFFER_WIDTH: usize = 180;
+const BUFFER_HEIGHT: usize = 100;
 const FOV: f32 = PI / 3.0;
 
 fn main() {
@@ -104,7 +104,7 @@ fn main() {
         } else {
             render_aberration(&mut buffer, &player);
         }
-        draw_portal(&mut tst_buffer, &player);
+        draw_portal(&mut tst_buffer, &player, &render_state);
 
         for i in 0..tst_buffer.len() {
             if tst_buffer[i] & 0xFF000000 == 0xFF000000 {

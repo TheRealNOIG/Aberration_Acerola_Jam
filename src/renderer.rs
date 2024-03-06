@@ -2,7 +2,10 @@ use std::cmp::min;
 
 use rand::Rng;
 
-use crate::{player::Player, raycast::ray_march, BUFFER_HEIGHT, BUFFER_WIDTH, FOV, MAP, TWO_PI};
+use crate::{
+    player::Player, raycast::ray_march, state::RenderState, BUFFER_HEIGHT, BUFFER_WIDTH, FOV, MAP,
+    TWO_PI,
+};
 
 pub fn scale_buffer(
     buffer: &[u32],
@@ -94,9 +97,10 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<f32
     z_buffer
 }
 
-// TODO:  make a sprite renderer that uses the depth buffer
+// TODO: make a sprite renderer that uses the depth buffer
 
-pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
+// TODO: cleanup portal renderer
+pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &RenderState) {
     for i in 0..buffer.len() {
         buffer[i] = 0;
     }
@@ -132,9 +136,8 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
                 let dy = y as f32 - sprite_screen_y;
                 if (dx.powi(2) / portal_width.powi(2)) + (dy.powi(2) / portal_height.powi(2)) <= 1.0
                 {
-                    // TODO: make color version of portal
                     let i = x + y * BUFFER_WIDTH;
-                    buffer[i] = 0xFF000000;
+                    // TODO: make color version of portal
 
                     // this one dose a cool cleanup effect of the static
                     // This should be used when the portal is not being blocked by a wall
@@ -142,9 +145,21 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player) {
 
                     // buffer[i] = buffer[i] ^ 0xFF000000;
 
-                    // and this one used when behind a wall.
-                    if rng.gen_range(0..=100) < 10 {
-                        buffer[i] = 0xFFFFFFFF;
+                    if !render_state.color_state {
+                        buffer[i] = 0xFF000000;
+                        // and this one used when behind a wall.
+                        if rng.gen_range(0..=100) < 10 {
+                            buffer[i] = 0xFFFFFFFF;
+                        }
+                    } else {
+                        let red = rng.gen::<u8>();
+                        let green = rng.gen::<u8>();
+                        let blue = rng.gen::<u8>();
+                        let color = 0xFF << 24
+                            | ((red as u32) << 16)
+                            | ((green as u32) << 8)
+                            | (blue as u32);
+                        buffer[i] = color;
                     }
                 }
             }
