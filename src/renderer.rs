@@ -33,15 +33,18 @@ pub fn scale_buffer(
     scaled_buffer
 }
 
-pub fn fill_buffer_rand(buffer: &mut Vec<u32>) {
+pub fn get_random_color() -> u32 {
     let mut rng = rand::thread_rng();
 
+    let red = rng.gen::<u8>();
+    let green = rng.gen::<u8>();
+    let blue = rng.gen::<u8>();
+    ((red as u32) << 16) | ((green as u32) << 8) | (blue as u32)
+}
+
+pub fn fill_buffer_rand(buffer: &mut Vec<u32>) {
     for i in 0..buffer.len() {
-        let red = rng.gen::<u8>();
-        let green = rng.gen::<u8>();
-        let blue = rng.gen::<u8>();
-        let color = ((red as u32) << 16) | ((green as u32) << 8) | (blue as u32);
-        buffer[i] = color;
+        buffer[i] = get_random_color();
     }
 }
 pub fn fill_buffer_rand_bw(buffer: &mut Vec<u32>) {
@@ -132,13 +135,11 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &Render
 
         for y in 0..BUFFER_HEIGHT {
             for x in 0..BUFFER_WIDTH {
+                let i = x + y * BUFFER_WIDTH;
                 let dx = x as f32 - sprite_screen_x;
                 let dy = y as f32 - sprite_screen_y;
                 if (dx.powi(2) / portal_width.powi(2)) + (dy.powi(2) / portal_height.powi(2)) <= 1.0
                 {
-                    let i = x + y * BUFFER_WIDTH;
-                    // TODO: make color version of portal
-
                     // this one dose a cool cleanup effect of the static
                     // This should be used when the portal is not being blocked by a wall
                     // buffer[i] = 0xFF000000;
@@ -146,20 +147,14 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &Render
                     // buffer[i] = buffer[i] ^ 0xFF000000;
 
                     if !render_state.color_state {
-                        buffer[i] = 0xFF000000;
                         // and this one used when behind a wall.
                         if rng.gen_range(0..=100) < 10 {
                             buffer[i] = 0xFFFFFFFF;
+                        } else {
+                            buffer[i] = 0xFF000000;
                         }
                     } else {
-                        let red = rng.gen::<u8>();
-                        let green = rng.gen::<u8>();
-                        let blue = rng.gen::<u8>();
-                        let color = 0xFF << 24
-                            | ((red as u32) << 16)
-                            | ((green as u32) << 8)
-                            | (blue as u32);
-                        buffer[i] = color;
+                        buffer[i] = get_random_color() ^ (0xFF as u32) << 24;
                     }
                 }
             }
