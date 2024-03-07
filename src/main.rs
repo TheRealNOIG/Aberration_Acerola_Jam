@@ -8,7 +8,7 @@ mod timer;
 use input_handling::handle_input;
 use minifb::{Key, Window, WindowOptions};
 use player::{move_player, Player};
-use renderer::{draw_portal, render_aberration, render_black_and_white, scale_buffer};
+use renderer::{draw_enemy, draw_portal, render_aberration, render_black_and_white, scale_buffer};
 use state::RenderState;
 use std::{cell::RefCell, f32::consts::PI, rc::Rc, u32, usize};
 use timer::Timer;
@@ -98,13 +98,15 @@ fn main() {
         );
 
         move_player(&mut player, &window_binding.borrow());
+        let mut test: Vec<f32>;
 
         if render_state.debug_render {
-            render_black_and_white(&mut buffer, &player);
+            test = render_black_and_white(&mut buffer, &player);
         } else {
-            render_aberration(&mut buffer, &player);
+            test = render_aberration(&mut buffer, &player);
         }
         draw_portal(&mut portal_buffer, &player, &render_state);
+        draw_enemy(&mut buffer, &test, &player, &render_state);
 
         for i in 0..portal_buffer.len() {
             if portal_buffer[i] & 0xFF000000 == 0xFF000000 {

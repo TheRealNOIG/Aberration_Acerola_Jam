@@ -100,8 +100,6 @@ pub fn render_aberration(prev_buffer: &mut Vec<u32>, player: &Player) -> Vec<f32
     z_buffer
 }
 
-// TODO: make a sprite renderer that uses the depth buffer
-
 // TODO: cleanup portal renderer and move gearic sprite possitioning code to its own function
 pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &RenderState) {
     for i in 0..buffer.len() {
@@ -115,11 +113,9 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &Render
     let delta_x = test.pos_x - player.pos_x;
     let delta_y = test.pos_y - player.pos_y;
 
-    // Calculate the distance and angle to the sprite
     let distance_to_sprite = (delta_x.powi(2) + delta_y.powi(2)).sqrt();
     let sprite_angle = delta_y.atan2(delta_x);
 
-    // Translate the sprite's angle to FOV coordinates
     let sprite_angle_relative_to_fov = (sprite_angle - player.rotation).rem_euclid(TWO_PI);
 
     let sprite_screen_x = (((sprite_angle_relative_to_fov + half_fov) / FOV) * BUFFER_WIDTH as f32)
@@ -158,6 +154,45 @@ pub fn draw_portal(buffer: &mut Vec<u32>, player: &Player, render_state: &Render
                     }
                 }
             }
+        }
+    }
+}
+
+pub fn draw_enemy(
+    buffer: &mut Vec<u32>,
+    z_buffer: &Vec<f32>,
+    player: &Player,
+    render_state: &RenderState,
+) {
+    let half_fov = FOV / 2.0;
+
+    let test: Player = Player::new(12.0, 12.0, 0.0);
+    let delta_x = test.pos_x - player.pos_x;
+    let delta_y = test.pos_y - player.pos_y;
+
+    let distance_to_sprite = (delta_x.powi(2) + delta_y.powi(2)).sqrt();
+    let sprite_angle = delta_y.atan2(delta_x);
+
+    let sprite_angle_relative_to_fov = (sprite_angle - player.rotation).rem_euclid(TWO_PI);
+
+    let sprite_screen_x = (((sprite_angle_relative_to_fov + half_fov) / FOV) * BUFFER_WIDTH as f32)
+        % BUFFER_WIDTH as f32;
+
+    println!(
+        "{},  {},   {}",
+        sprite_screen_x, z_buffer[sprite_screen_x as usize], distance_to_sprite
+    );
+
+    if distance_to_sprite < z_buffer[sprite_screen_x as usize]
+        && (sprite_angle_relative_to_fov <= half_fov
+        || sprite_angle_relative_to_fov >= (TWO_PI) - half_fov)
+    {
+        let sprite_size = BUFFER_HEIGHT as f32 / distance_to_sprite;
+        let sprite_screen_y = (BUFFER_HEIGHT as f32 - sprite_size) / 2.0;
+        let start_y = sprite_screen_y.max(0.0) as usize;
+        let end_y = (sprite_screen_y + sprite_size).min(BUFFER_HEIGHT as f32) as usize;
+        for y in start_y..end_y {
+            buffer[sprite_screen_x as usize + y * BUFFER_WIDTH] = 0xFFFFFFFF;
         }
     }
 }
