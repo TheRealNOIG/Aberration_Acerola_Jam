@@ -175,24 +175,32 @@ pub fn draw_enemy(
 
     let sprite_angle_relative_to_fov = (sprite_angle - player.rotation).rem_euclid(TWO_PI);
 
-    let sprite_screen_x = (((sprite_angle_relative_to_fov + half_fov) / FOV) * BUFFER_WIDTH as f32)
-        % BUFFER_WIDTH as f32;
+    let sprite_screen_x: usize = ((((sprite_angle_relative_to_fov + half_fov) / FOV)
+        * BUFFER_WIDTH as f32)
+        % BUFFER_WIDTH as f32) as usize;
 
     println!(
         "{},  {},   {}",
-        sprite_screen_x, z_buffer[sprite_screen_x as usize], distance_to_sprite
+        sprite_screen_x, z_buffer[sprite_screen_x], distance_to_sprite
     );
 
-    if distance_to_sprite < z_buffer[sprite_screen_x as usize]
-        && (sprite_angle_relative_to_fov <= half_fov
+    // TODO: clean this crap up
+
+    if (sprite_angle_relative_to_fov <= half_fov
         || sprite_angle_relative_to_fov >= (TWO_PI) - half_fov)
     {
         let sprite_size = BUFFER_HEIGHT as f32 / distance_to_sprite;
         let sprite_screen_y = (BUFFER_HEIGHT as f32 - sprite_size) / 2.0;
         let start_y = sprite_screen_y.max(0.0) as usize;
         let end_y = (sprite_screen_y + sprite_size).min(BUFFER_HEIGHT as f32) as usize;
-        for y in start_y..end_y {
-            buffer[sprite_screen_x as usize + y * BUFFER_WIDTH] = 0xFFFFFFFF;
+        for x in sprite_screen_x.saturating_sub(50)..sprite_screen_x.saturating_add(50) {
+            if x < z_buffer.len() {
+                if distance_to_sprite < z_buffer[x] {
+                    for y in start_y..end_y {
+                        buffer[x as usize + y * BUFFER_WIDTH] = 0xFFFFFFFF;
+                    }
+                }
+            }
         }
     }
 }
